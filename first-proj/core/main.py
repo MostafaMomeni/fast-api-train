@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 import uvicorn
 from fastapi.openapi.utils import get_openapi
 from contextlib import asynccontextmanager
+from dataclasses import dataclass
 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
@@ -36,10 +37,19 @@ async def root():
 async def get_names():
     return names
 
+@dataclass
+class Student:
+    name:str
 
-@app.post("/names")
-def create_name(name: str = Body(embed=True)):
-    new_name = {"id": names[-1]["id"] + 1, "name": name}
+@dataclass
+class StudentResponse:
+    id:int
+    name:str
+
+
+@app.post("/names" ,  status_code=201 , response_model=StudentResponse)
+def create_name(student: Student ):
+    new_name = {"id": names[-1]["id"] + 1, "name": student.name}
     names.append(new_name)
     return new_name
 
